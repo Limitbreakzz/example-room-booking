@@ -70,6 +70,17 @@ exports.createUser = async (req, res) => {
   }
 
   try {
+    const existingUser = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (existingUser) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Email already exists',
+      });
+    }
+  
     const newUser = await prisma.user.create({
       data: {
         name,
@@ -97,7 +108,7 @@ exports.createUser = async (req, res) => {
 };
 
 exports.updateUser = async (req, res) => {
-    const userId = parseInt(req.params.id, 10);
+  const userId = Number(req.params.id);
   const { name, email, password, tel, role } = req.body;
 
   if (isNaN(userId)) {
