@@ -1,8 +1,8 @@
-const prisma = require('../prisma');
+const prisma = require('../prisma')
 
 exports.getUsers = async (req, res) => {
     try {
-    const users = await prisma.room.findMany();
+    const users = await prisma.user.findMany();
 
     res.json({
       status: 'success',
@@ -30,11 +30,11 @@ exports.getUserById = async (req, res) => {
   }
 
   try {
-    const room = await prisma.room.findUnique({
+    const user = await prisma.user.findUnique({
       where: { id: userId },
     });
 
-    if (!room) {
+    if (!user) {
       return res.status(404).json({
         status: 'error',
         message: 'user not found',
@@ -44,7 +44,7 @@ exports.getUserById = async (req, res) => {
     res.json({
       status: 'success',
       message: 'User retrieved successfully',
-      data: room,
+      data: user,
     });
   } catch (error) {
     console.error('Error fetching user:', error);
@@ -59,12 +59,12 @@ exports.getUserById = async (req, res) => {
 exports.createUser = async (req, res) => {
     const { name, email, password, tel } = req.body;
 
-  if (!name || typeof tel !== 'number') {
+  if (!name) {
     return res.status(400).json({
       status: 'error',
       message: 'Invalid request body',
       error: {
-        detail: 'name is required and tel must be a number',
+        detail: 'name is required',
       },
     });
   }
@@ -76,6 +76,7 @@ exports.createUser = async (req, res) => {
         email,
         password,
         tel: tel || null,
+        role: 'user',
       },
     });
 
@@ -97,7 +98,7 @@ exports.createUser = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
     const userId = parseInt(req.params.id, 10);
-  const { name, email, password, tel } = req.body;
+  const { name, email, password, tel, role } = req.body;
 
   if (isNaN(userId)) {
     return res.status(400).json({
@@ -106,12 +107,12 @@ exports.updateUser = async (req, res) => {
     });
   }
 
-  if (!name || typeof tel !== 'number') {
+  if (!name) {
     return res.status(400).json({
       status: 'error',
       message: 'Invalid request body',
       error: {
-        detail: 'name is required and tel must be a number',
+        detail: 'name is required',
       },
     });
   }
@@ -124,6 +125,7 @@ exports.updateUser = async (req, res) => {
         email,
         password,
         tel: tel ?? null,
+        role  ,
       },
     });
 
@@ -152,7 +154,7 @@ exports.updateUser = async (req, res) => {
 };
 
 exports.deleteUser = async (req, res) => {
-    const UserId = parseInt(req.params.id, 10);
+    const userId = parseInt(req.params.id, 10);
 
   if (isNaN(userId)) {
     return res.status(400).json({
@@ -176,7 +178,7 @@ exports.deleteUser = async (req, res) => {
 
     if (error.code === 'P2025') {
       return res.status(404).json({
-        status: 'error',
+        status: 'fail',
         message: 'User not found',
       });
     }
