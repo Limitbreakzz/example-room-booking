@@ -136,7 +136,7 @@ exports.updateUser = async (req, res) => {
         email,
         password,
         tel: tel ?? null,
-        role  ,
+        role,
       },
     });
 
