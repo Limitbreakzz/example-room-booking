@@ -57,7 +57,7 @@ exports.getUserById = async (req, res) => {
 };
 
 exports.createUser = async (req, res) => {
-    const { name, email, password, tel } = req.body;
+    const { name, email, password, tel, role } = req.body;
 
   if (!name) {
     return res.status(400).json({
@@ -87,7 +87,7 @@ exports.createUser = async (req, res) => {
         email,
         password,
         tel: tel || null,
-        role: 'user',
+        role: role || 'user',
       },
     });
 
@@ -136,7 +136,7 @@ exports.updateUser = async (req, res) => {
         email,
         password,
         tel: tel ?? null,
-        role,
+        role: role ?? 'role',
       },
     });
 
@@ -147,8 +147,6 @@ exports.updateUser = async (req, res) => {
     });
   } catch (error) {
     console.error('Error updating user:', error);
-
-    // Prisma error: record not found
     if (error.code === 'P2025') {
       return res.status(404).json({
         status: 'error',
